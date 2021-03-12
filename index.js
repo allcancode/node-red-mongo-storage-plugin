@@ -1,5 +1,15 @@
-const constants = require("./constants");
-const MongoHandler = require("./MongoHandler");
+var instances = {};
+
+module.exports = function(instance_id) {
+   if (instances[instance_id]) {
+       return instances[instance_id];
+   }
+
+
+const constants = require("./constants")(instance_id);
+const MongoHandler = require("./MongoHandler")(instance_id);
+
+const fs = require('fs');
 
 
 var settings;
@@ -36,7 +46,9 @@ var storageModule = {
     },
 
     saveCredentials: function(credentials) {
-        return mongoHandler.saveAll(this.collectionNames.credentials, credentials);
+        credentials.cred = credentials.$
+        delete credentials.$
+        return mongoHandler.saveAll(this.collectionNames.credentials, [credentials]);
     },
 
     getSettings: function() {
@@ -61,4 +73,7 @@ var storageModule = {
     }
 };
 
-module.exports = storageModule;
+instances[instance_id] = storageModule;
+return storageModule;
+
+};

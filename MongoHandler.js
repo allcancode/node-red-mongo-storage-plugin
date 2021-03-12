@@ -1,7 +1,15 @@
+var instances = {};
+
+module.exports = function(instance_id) {
+   if (instances[instance_id]) {
+       return instances[instance_id];
+   }
+
 const when = require('when');
 const Promise = when.promise;
 const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
+
 
 let MongoHandler = class MongoHandler {
   constructor(url, databaseName) {
@@ -25,7 +33,6 @@ let MongoHandler = class MongoHandler {
     })
   }  
 
-
   
   findAll(collectionName) {
     return Promise((resolve, reject) => {
@@ -37,7 +44,10 @@ let MongoHandler = class MongoHandler {
             }
             if (storageDocuments == null) {
                 resolve({});
-            } else {                                
+            } else {
+              if(collectionName=='nodered-credentials'){
+                storageDocuments = {'$': storageDocuments[0].cred}
+              }                               
               resolve(storageDocuments);
             }
         });
@@ -49,19 +59,24 @@ let MongoHandler = class MongoHandler {
 
 
   saveAll(collectionName, objects) {
+    //console.log(collectionName)
+    //console.log(objects)
+    // if(collectionName=='nodered-credentials'){
+    //   console.log(objects.length)
+    // }
     return Promise(async (resolve, reject) => {
-      try {           
-        await this.dropCollectionIfExists(collectionName);        
+      try {         
+        await this.dropCollectionIfExists(collectionName);      
         
         if(objects.length > 0){
-        let bulk = this.dbInstace.collection(collectionName).initializeUnorderedBulkOp();          
+          let bulk = this.dbInstace.collection(collectionName).initializeUnorderedBulkOp();          
           objects.forEach((obj) => {
             bulk.insert(obj);
           });                  
           bulk.execute();
         }
 
-        resolve();        
+        resolve();       
       } catch (ex) {
         reject(ex);
       }
@@ -143,4 +158,10 @@ let MongoHandler = class MongoHandler {
   }
 };
 
-module.exports = MongoHandler;
+//module.exports = MongoHandler;
+
+
+instances[instance_id] = MongoHandler;
+return MongoHandler;
+
+};
