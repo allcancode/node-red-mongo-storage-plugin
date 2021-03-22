@@ -21,13 +21,13 @@ let MongoHandler = class MongoHandler {
 
   connect() {
     return Promise((resolve, reject) => {
-      MongoClient.connect(this.url, (err, client) => {
+      MongoClient.connect(this.url, {useUnifiedTopology: true }, (err, client) => {
         if (err) {
           reject(err);
         }
 
         this.client = client;
-        this.dbInstace = client.db(this.databaseName, {useUnifiedTopology: true });
+        this.dbInstace = client.db(this.databaseName);
         resolve();
       });
     })
