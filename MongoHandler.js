@@ -1,10 +1,3 @@
-var instances = {};
-
-module.exports = function(instance_id) {
-   if (instances[instance_id]) {
-       return instances[instance_id];
-   }
-
 const when = require('when');
 const Promise = when.promise;
 const MongoDB = require('mongodb');
@@ -45,7 +38,7 @@ let MongoHandler = class MongoHandler {
             if (storageDocuments == null) {
                 resolve({});
             } else {
-              if(collectionName=='nodered-credentials'){
+              if(collectionName.includes('nodered-credentials') && storageDocuments.length > 0){
                 storageDocuments = {'$': storageDocuments[0].cred}
               }                               
               resolve(storageDocuments);
@@ -158,10 +151,5 @@ let MongoHandler = class MongoHandler {
   }
 };
 
-//module.exports = MongoHandler;
+module.exports = MongoHandler;
 
-
-instances[instance_id] = MongoHandler;
-return MongoHandler;
-
-};

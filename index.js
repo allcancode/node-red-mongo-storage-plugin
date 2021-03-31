@@ -1,13 +1,5 @@
-var instances = {};
-
-module.exports = function(instance_id) {
-   if (instances[instance_id]) {
-       return instances[instance_id];
-   }
-
-
-const constants = require("./constants")(instance_id);
-const MongoHandler = require("./MongoHandler")(instance_id);
+const constants = require("./constants");
+const MongoHandler = require("./MongoHandler");
 
 const fs = require('fs');
 
@@ -73,7 +65,4 @@ var storageModule = {
     }
 };
 
-instances[instance_id] = storageModule;
-return storageModule;
-
-};
+module.exports = storageModule;
